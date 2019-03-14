@@ -1,9 +1,18 @@
 
 package aula3clienteteste;
 
+import aula3util.IChatAula;
+import aula3util.Message;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.util.List;
+import javax.swing.JOptionPane;
+
 public class ChatTela extends javax.swing.JFrame {
 
-
+    
     public ChatTela() {
         initComponents();
     }
@@ -33,6 +42,11 @@ public class ChatTela extends javax.swing.JFrame {
         });
 
         Enviar.setText("Enviar");
+        Enviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                EnviarActionPerformed(evt);
+            }
+        });
 
         Conversa.setColumns(20);
         Conversa.setRows(5);
@@ -88,6 +102,38 @@ public class ChatTela extends javax.swing.JFrame {
         
     }//GEN-LAST:event_MensagemActionPerformed
 
+    private void EnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_EnviarActionPerformed
+        
+        String nome = "";
+        String msgp = "";
+        
+        try {
+            while (msgp != "0") {
+                msgp = JOptionPane.showInputDialog("Chat - " + nome
+                        + " Digite a sua mensagem. (Tecle 0 para Sair!)");
+                IChatAula objChat = (IChatAula) Naming
+                        .lookup("rmi://localhost:8282/chat");
+                Message msg = new Message(nome, msgp);
+                objChat.sendMessage(msg);
+                System.out.println(returnMessage(objChat.retrieveMessage()));
+            }
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        } catch (NotBoundException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }//GEN-LAST:event_EnviarActionPerformed
+    private static String returnMessage(List<Message> lst) {
+        String valor = "";
+        for (Message message : lst) {
+            valor += message.getUser() + ": " + message.getMessage() + "\n";
+        }
+        return valor;
+    }
 
     public static void main(String args[]) {
 
